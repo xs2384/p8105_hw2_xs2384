@@ -52,7 +52,7 @@ snp = read_csv("./datasets/fivethirtyeight_datasets/snp.csv") %>% janitor::clean
 snp
 ```
 
-```{r}
+```{r, message=FALSE}
 unemp = read_csv("./datasets/fivethirtyeight_datasets/unemployment.csv") %>% janitor::clean_names()
 unemp_tidy = pivot_longer(
   unemp,
