@@ -3,7 +3,7 @@ title: "p8105_hw2_xs2384"
 output: github_document
 ---
 ## Problem 1
-```{r}
+```{r message=FALSE}
 library(tidyverse)
 mr_trash_wheel = readxl::read_excel("./datasets/Trash-Wheel-Collection-Totals-8-6-19.xlsx",sheet = "Mr. Trash Wheel", range = "A2:N407") %>% janitor::clean_names() %>% drop_na() %>% mutate(
   sports_balls = as.integer(sports_balls)
@@ -37,7 +37,7 @@ The total precipitation in 2018 is `r sum(precip_2017to2018$total)`. The median 
 
 ## Problem 2
 
-```{r}
+```{r warning=FALSE, message=FALSE}
 pols_month = read_csv("./datasets/fivethirtyeight_datasets/pols-month.csv") %>% janitor::clean_names() %>% separate(mon, into = c("year", "month", "day")) %>% mutate(
   month = month.name[as.integer(month)],
   year = as.integer(year),
@@ -47,7 +47,7 @@ pols_month = read_csv("./datasets/fivethirtyeight_datasets/pols-month.csv") %>% 
 pols_month
 ```
 
-```{r}
+```{r, message=FALSE}
 snp = read_csv("./datasets/fivethirtyeight_datasets/snp.csv") %>% janitor::clean_names() %>% separate(date, into = c( "month","day","year")) %>% select(year, month, everything(), -day) %>% mutate(month = as.integer(month)) %>% arrange(year, month) %>%  mutate(month = month.name[month], year = as.integer(year))
 snp
 ```
@@ -95,3 +95,26 @@ This dataset has a dimention of `r nrow(unemp_tidy)` x `r ncol(unemp_tidy)`. And
 
 
 ## Problem 3
+
+```{r, message=FALSE, warning=FALSE}
+popular_baby_names = read_csv("./datasets/Popular_Baby_Names.csv") %>% janitor::clean_names() %>% mutate(
+  childs_first_name = str_to_lower(childs_first_name),
+  childs_first_name = paste(str_to_upper(substr(childs_first_name,1,1)),substr(childs_first_name,2,nchar(childs_first_name)), sep ="" )
+) %>% distinct()
+for(i in seq(1,nrow(popular_baby_names),1)){
+  if(popular_baby_names$ethnicity[i] != "ASIAN AND PACIFIC ISLANDER" & popular_baby_names$ethnicity[i] != "BLACK NON HISPANIC" & popular_baby_names$ethnicity[i] != "HISPANIC" & popular_baby_names$ethnicity[i] != "WHITE NON HISPANIC"){
+    if(startsWith(popular_baby_names$ethnicity[i],"A") == TRUE){
+      popular_baby_names$ethnicity[i] = "ASIAN AND PACIFIC ISLANDER"
+    }
+    if(startsWith(popular_baby_names$ethnicity[i],"B") == TRUE){
+      popular_baby_names$ethnicity[i] = "BLACK NON HISPANIC"
+    }
+    if(startsWith(popular_baby_names$ethnicity[i],"H") == TRUE){
+      popular_baby_names$ethnicity[i] = "HISPANIC"
+    }
+    if(startsWith(popular_baby_names$ethnicity[i],"W") == TRUE){
+      popular_baby_names$ethnicity[i] = "WHITE NON HISPANIC"
+    }
+  }
+}
+```
