@@ -1,0 +1,97 @@
+---
+title: "p8105_hw2_xs2384"
+output: github_document
+---
+## Problem 1
+```{r}
+library(tidyverse)
+mr_trash_wheel = readxl::read_excel("./datasets/Trash-Wheel-Collection-Totals-8-6-19.xlsx",sheet = "Mr. Trash Wheel", range = "A2:N407") %>% janitor::clean_names() %>% drop_na() %>% mutate(
+  sports_balls = as.integer(sports_balls)
+)
+mr_trash_wheel
+```
+
+```{r}
+precip_2017 = readxl::read_excel("./datasets/Trash-Wheel-Collection-Totals-8-6-19.xlsx",sheet = "2017 Precipitation", range = "A2:B14") %>% janitor::clean_names() %>% mutate(
+  year = 2017
+) %>% select(year, month, everything())
+precip_2017
+```
+```{r}
+precip_2018 = readxl::read_excel("./datasets/Trash-Wheel-Collection-Totals-8-6-19.xlsx",sheet = "2018 Precipitation", range = "A2:B14") %>% janitor::clean_names() %>% mutate(
+  year = 2018
+) %>% select(year, month, everything())
+precip_2018
+```
+```{r, message=FALSE, warning= FALSE}
+precip_2017to2018 = full_join(precip_2017,precip_2018) %>% mutate(
+  month = month.name[month]
+)
+precip_2017to2018
+```
+
+##### Paragraph
+The Mr. Trash Wheel datasets contains `r nrow(mr_trash_wheel)` observation in total. And the combination of precipitation 2017 and 2018 contains `r nrow(precip_2017to2018)`. From my perspective, the key variables are the dumpster number year, month and date. The dumpster number tells us which dumpster was recorded. The date variables tell us when and help us to quickly located the data we want, and can help us easy to make the statsitics through a period of time.
+
+The total precipitation in 2018 is `r sum(precip_2017to2018$total)`. The median number of sports balls in a dumpster in 2017 is `r median(mr_trash_wheel[which(mr_trash_wheel$year == 2017), ]$sports_balls)`. 
+
+## Problem 2
+
+```{r}
+pols_month = read_csv("./datasets/fivethirtyeight_datasets/pols-month.csv") %>% janitor::clean_names() %>% separate(mon, into = c("year", "month", "day")) %>% mutate(
+  month = month.name[as.integer(month)],
+  year = as.integer(year),
+  day = as.integer(day),
+  president = ifelse(prez_gop != 0, "gop", "dem")
+) %>% select(year, month, president, everything(), -prez_gop, -prez_dem, -day)
+pols_month
+```
+
+```{r}
+snp = read_csv("./datasets/fivethirtyeight_datasets/snp.csv") %>% janitor::clean_names() %>% separate(date, into = c( "month","day","year")) %>% select(year, month, everything(), -day) %>% mutate(month = as.integer(month)) %>% arrange(year, month) %>%  mutate(month = month.name[month], year = as.integer(year))
+snp
+```
+
+```{r}
+unemp = read_csv("./datasets/fivethirtyeight_datasets/unemployment.csv") %>% janitor::clean_names()
+unemp_tidy = pivot_longer(
+  unemp,
+  jan:dec,
+  names_to = "month",
+  values_to = "unemp_rate"
+) 
+for(i in seq(1,nrow(unemp_tidy),1)){
+  if(unemp_tidy$month[i]=="jan"){unemp_tidy$month[i]=month.name[1]}
+  if(unemp_tidy$month[i]=="feb"){unemp_tidy$month[i]=month.name[2]}
+  if(unemp_tidy$month[i]=="mar"){unemp_tidy$month[i]=month.name[3]}
+  if(unemp_tidy$month[i]=="apr"){unemp_tidy$month[i]=month.name[4]}
+  if(unemp_tidy$month[i]=="may"){unemp_tidy$month[i]=month.name[5]}
+  if(unemp_tidy$month[i]=="jun"){unemp_tidy$month[i]=month.name[6]}
+  if(unemp_tidy$month[i]=="jul"){unemp_tidy$month[i]=month.name[7]}
+  if(unemp_tidy$month[i]=="aug"){unemp_tidy$month[i]=month.name[8]}
+  if(unemp_tidy$month[i]=="sep"){unemp_tidy$month[i]=month.name[9]}
+  if(unemp_tidy$month[i]=="oct"){unemp_tidy$month[i]=month.name[10]}
+  if(unemp_tidy$month[i]=="nov"){unemp_tidy$month[i]=month.name[11]}
+  if(unemp_tidy$month[i]=="dec"){unemp_tidy$month[i]=month.name[12]}
+}
+unemp_tidy
+```
+
+```{r}
+df = full_join(snp, pols_month, by = c("year","month"))
+df = full_join(df, unemp_tidy, by = c("year", "month"))
+df
+```
+
+##### Paragraph
+The pols_month dataset contains the numbers of senators, representatives and governors of party of republication and democracy at each month of each year. And indicate what party the president was in at that month. 
+This dataset has a dimention of `r nrow(pols_month)` x `r ncol(pols_month)`. And the range of year is `r range(pols_month$year)[1]` to `r range(pols_month$year)[2]`. The key variables are the indicator of the party of president at each month and the number of major people in each party at that time. 
+
+The snp dataset contains the closing values of the S&P stock market index on the first day of each month of each year. 
+This dataset has a dimention of `r nrow(snp)` x `r ncol(snp)`. And the range of year is `r range(snp$year)[1]` to `r range(snp$year)[2]`. The key variable is the closing values of the S$P stock index on each month of each year.
+
+The unempolyment datasets contains the unemployment rate of each month of each year.
+This dataset has a dimention of `r nrow(unemp_tidy)` x `r ncol(unemp_tidy)`. And the range of year is `r range(unemp_tidy$year)[1]` to `r range(unemp_tidy$year)[2]`. The key variable is the unemployment rate of each month of each year. 
+
+
+## Problem 3
