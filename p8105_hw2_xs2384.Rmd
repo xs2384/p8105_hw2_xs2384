@@ -140,3 +140,35 @@ names(df_olivia)[2:length(names(df_olivia))] = c("rank_olivia_2011", "rank_olivi
 df_olivia
 
 ```
+
+```{r}
+df_mostpop = tibble("ethnicity" = c("ASIAN AND PACIFIC ISLANDER", "BLACK NON HISPANIC", "HISPANIC", "WHITE NON HISPANIC"), 2011, 2012, 2013, 2014, 2015, 2016 )
+
+for(i in seq(1,nrow(popular_baby_names),1)){
+  if(popular_baby_names$rank[i] == 1 & popular_baby_names$ethnicity[i] == "ASIAN AND PACIFIC ISLANDER" & popular_baby_names$gender[i] == "MALE"){
+    df_mostpop[[as.character(popular_baby_names$year_of_birth[i])]][which(df_mostpop$ethnicity == "ASIAN AND PACIFIC ISLANDER")] = popular_baby_names$childs_first_name[i]
+  }
+  if(popular_baby_names$rank[i] == 1 & popular_baby_names$ethnicity[i] == "BLACK NON HISPANIC" & popular_baby_names$gender[i] == "MALE"){
+    df_mostpop[[as.character(popular_baby_names$year_of_birth[i])]][which(df_mostpop$ethnicity == "BLACK NON HISPANIC")] = popular_baby_names$childs_first_name[i]
+  }
+  if(popular_baby_names$rank[i] == 1 & popular_baby_names$ethnicity[i] == "HISPANIC" & popular_baby_names$gender[i] == "MALE"){
+    df_mostpop[[as.character(popular_baby_names$year_of_birth[i])]][which(df_mostpop$ethnicity == "HISPANIC")] = popular_baby_names$childs_first_name[i]
+  }
+  if(popular_baby_names$rank[i] == 1 & popular_baby_names$ethnicity[i] == "WHITE NON HISPANIC" & popular_baby_names$gender[i] == "MALE"){
+    df_mostpop[[as.character(popular_baby_names$year_of_birth[i])]][which(df_mostpop$ethnicity == "WHITE NON HISPANIC")] = popular_baby_names$childs_first_name[i]
+  }
+}
+
+names(df_mostpop)[2:length(names(df_mostpop))] = c("most_malename_2011", "most_malename_2012", "most_malename_2013", "most_malename_2014", "most_malename_2015", "most_malename_2016")
+
+df_mostpop
+
+
+```
+
+```{r}
+df_male_white_2016 = popular_baby_names[which(popular_baby_names$year_of_birth == 2016 & popular_baby_names$gender == "MALE" & popular_baby_names$ethnicity == "WHITE NON HISPANIC"), ]
+
+ggplot(df_male_white_2016, aes(x = rank, y = count)) + 
+  geom_point()
+```
